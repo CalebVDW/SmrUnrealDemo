@@ -1,7 +1,7 @@
 // Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 
 #include "SMRDemo.h"
-
+#include "SmrFunctions.h"
 #include "AnimNode_Smr.h"
 #include "AnimationRuntime.h"
 
@@ -9,52 +9,56 @@
 // FAnimNode_ModifyBone
 
 FAnimNode_Smr::FAnimNode_Smr()
-	:FAnimNode_SkeletalControlBase()
+	:FAnimNode_Base()
 {
 }
 
+void FAnimNode_Smr::Initialize(const FAnimationInitializeContext& Context)
+{
+	FAnimNode_Base::Initialize(Context);
+	basePose.Initialize(Context);
+
+}
+
+void FAnimNode_Smr::CacheBones(const FAnimationCacheBonesContext& Context)
+{
+	basePose.CacheBones(Context);
+}
+
+void FAnimNode_Smr::Update(const FAnimationUpdateContext& Context)
+{
+	basePose.Update(Context);
+}
+
+void FAnimNode_Smr::Evaluate(FPoseContext& Output)
+{
+	//I have no idea what this evaluate function does
+	FPoseContext NewPoseContext(Output);
+	basePose.Evaluate(Output);
+
+	FBoneContainer outputBones = Output.Pose.GetBoneContainer();
+	SMRSkeleton smrSkeleton = SmrInput->getSkeleton();
+
+	//Step through all bones in the output context
+	for (int i = 0; i < outputBones.GetNumBones(); ++i)
+	{	
+		//Get name of current bone
+		FName boneName = SkeletonComp->GetBoneName(i);
+		SMRJoint* smrBone = smrSkeleton.getJointByName(std::string(TCHAR_TO_UTF8(*boneName.ToString())));
+
+		//Build a transform from the SMR bone data
+		FTransform newTransform;
+		newTransform.SetTranslation(USmrFunctions::MakeFVector(smrBone->getPosition()));
+		newTransform.SetRotation(USmrFunctions::MakeFQuat(smrBone->getOrientation()));
+
+		//Apply transform to output pose
+		//FCompactPose uses indexing operator to access transforms of bones
+		//Bones are actually stored only as transforms
+		Output.Pose[FCompactPoseBoneIndex(i)] = newTransform;
+	}
+
+}
 void FAnimNode_Smr::GatherDebugData(FNodeDebugData& DebugData)
 {
-	
+	/*Not sure what is supposed to go here but I'm sure I'll figure it out one day*/
 }
-
-void FAnimNode_Smr::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases, TArray<FBoneTransform>& OutBoneTransforms)
-{
-	SMRSkeleton skeleton = SmrInput->getSkeleton();
-	uint32 numBones = skeleton.getNumJoints();
-
-	const FBoneContainer BoneContainer = MeshBases.GetPose().GetBoneContainer();
-
-	//Apply rotation to each bone
-	for (int i = 0; i < numBones; ++i)
-	{
-		FBoneReference BoneToModify;
-
-		// Convert to Bone Space.
-		FAnimationRuntime::ConvertCSTransformToBoneSpace(SkelComp, MeshBases, NewBoneTM, CompactPoseBoneToModify, RotationSpace);
-
-		//Get data from SMR
-		FQuat newRotation;		
-
-
-		
-		NewBoneTM.SetRotation(newRotation);
-
-		// Convert back to Component Space.
-		FAnimationRuntime::ConvertBoneSpaceTransformToCS(SkelComp, MeshBases, NewBoneTM, CompactPoseBoneToModify, RotationSpace);
-	}
-	
-}
-
-bool FAnimNode_Smr::IsValidToEvaluate(const USkeleton* Skeleton, const FBoneContainer& RequiredBones) 
-{
-	// if both bones are valid
-	return true;
-}
-
-void FAnimNode_Smr::InitializeBoneReferences(const FBoneContainer& RequiredBones) 
-{
-	
-}
-
-SMRSkeleton FAnimNode_Smr::getCurrentSkeleton(){return SmrInput->getSkeleton(): }

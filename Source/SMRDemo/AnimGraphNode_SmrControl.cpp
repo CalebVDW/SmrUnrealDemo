@@ -3,9 +3,18 @@
 #include "SMRDemo.h"
 #include "AnimGraphNode_SmrControl.h"
 
+#define LOCTEXT_NAMESPACE "SmrNodes"
 
-void UAnimGraphNode_SmrControl::DoRotation(const USkeletalMeshComponent* SkelComp, FRotator& Rotation, FAnimNode_Base* InOutAnimNode)
+
+//PUBLIC INTERFACE/////////////////////////////////////////////////////////////////////////////////
+FText UAnimGraphNode_SmrControl::GetNodeTitle(ENodeTitleType::Type TitleType) const { return LOCTEXT("AnimGraphNode_SmrControl_Title", "Apply SMR Pose"); }
+FText UAnimGraphNode_SmrControl::GetTooltipText() const { return LOCTEXT("AnimGraphNode_SmrControl_Tooltip", "Apply SMR pose to skeleton"); }
+
+FString UAnimGraphNode_SmrControl::GetNodeCategory() const { return TEXT("SMR Nodes"); }
+
+void UAnimGraphNode_SmrControl::ValidateAnimNodeDuringCompilation(class USkeleton* ForSkeleton, class FCompilerResultsLog& MessageLog)
 {
-	FAnimNode_Smr* ApplySmrPose = static_cast<FAnimNode_Smr*>(InOutAnimNode);
+	/*
+	*This function could contain a routine to check that the skeleton matches the animation file to be applied
+	*/
 }
-

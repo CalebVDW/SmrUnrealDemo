@@ -10,17 +10,17 @@
  * 
  */
 UCLASS()
-class SMRDEMO_API UAnimGraphNode_SmrControl : public UAnimGraphNode_SkeletalControlBase
+class SMRDEMO_API UAnimGraphNode_SmrControl : public UAnimGraphNode_Base
 {
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere, Category = Settings)
 	FAnimNode_Smr Node;
 public:
+	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
+	virtual FText GetTooltipText() const override;
 
-
-protected:
-	virtual void DoRotation(const USkeletalMeshComponent* SkelComp, FRotator& Rotation, FAnimNode_Base* InOutAnimNode) override;
-
+	virtual FString GetNodeCategory() const override;
+	virtual void ValidateAnimNodeDuringCompilation(class USkeleton* ForSkeleton, class FCompilerResultsLog& MessageLog) override;
 
 };
