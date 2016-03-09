@@ -4,6 +4,7 @@
 
 #include "GameFramework/Actor.h"
 #include "Smr.h"
+#include "Classes/Components/PoseableMeshComponent.h"
 #include "SmrMotion.generated.h"
 
 UCLASS()
@@ -22,10 +23,16 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 
 	//Loads the skeleton from a BVH file
+	UFUNCTION(BlueprintCallable, Category = SMR)
 	void LoadSkeleton(FString path);
 	
 	//Loads the animation from a BVH file
+	UFUNCTION(BlueprintCallable, Category = SMR)
 	void LoadAnimation(FString path);
+
+	//Apply world space pose to a poseable mesh
+	UFUNCTION(BlueprintCallable, Category = SMR)
+	void PoseCharacterWorldSpace(UPoseableMeshComponent* mesh);
 
 	const SMRSkeleton& getSkeleton();
 
