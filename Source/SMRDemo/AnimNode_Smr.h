@@ -22,9 +22,6 @@ struct FAnimNode_Smr : public FAnimNode_Base
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SkeletalControl, meta = (PinShownByDefault))
 	ASmrMotion* SmrInput;
 
-	//Unreal SkeletalMesh that is being used for the model being animated
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SkeletalControl, meta = (PinShownByDefault))
-	USkeletalMeshComponent* SkeletonComp;
 
 public:
 	FAnimNode_Smr();

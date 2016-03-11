@@ -38,7 +38,7 @@ void ASmrMotion::LoadSkeleton(FString path)
 {
 	std::string skeletonFilePath = "C:/Git/SMRFork/data/bvh/benTest.bvh";
 	skeleton = loadSkeletonFromBVH(getFileName(skeletonFilePath));
-	skeleton.setRotationOrder(ROTATIONFIRST);
+	skeleton.setRotationOrder(TRANSLATIONFIRST);
 
 	for (uint32 i = 0; i < skeleton.getNumJoints(); ++i)
 	{

@@ -27,36 +27,45 @@ void FAnimNode_Smr::CacheBones(const FAnimationCacheBonesContext& Context)
 
 void FAnimNode_Smr::Update(const FAnimationUpdateContext& Context)
 {
+	EvaluateGraphExposedInputs.Execute(Context);
 	basePose.Update(Context);
 }
 
 void FAnimNode_Smr::Evaluate(FPoseContext& Output)
 {
-	//I have no idea what this evaluate function does
-	FPoseContext NewPoseContext(Output);
 	basePose.Evaluate(Output);
 
-	FBoneContainer outputBones = Output.Pose.GetBoneContainer();
-	SMRSkeleton smrSkeleton = SmrInput->getSkeleton();
+	FReferenceSkeleton unrealSkeleton = Output.Pose.GetBoneContainer().GetReferenceSkeleton();
+
+	SMRSkeleton smrSkeleton;
+	if (SmrInput)
+		smrSkeleton = SmrInput->getSkeleton();
+	else
+		return;
+	smrSkeleton.setMode(SMRModeType::RELATIVEMODE);
+	smrSkeleton.setRotationOrder(TRANSLATIONFIRST);
 
 	//Step through all bones in the output context
-	for (int i = 0; i < outputBones.GetNumBones(); ++i)
+	for (int i = 0; i < Output.Pose.GetNumBones(); ++i)
 	{	
-		//Get name of current bone
-		FName boneName = SkeletonComp->GetBoneName(i);
+		//Get the SMR bone that corresponds to the current Unreal bone
+		FName boneName = unrealSkeleton.GetBoneName(i);
 		SMRJoint* smrBone = smrSkeleton.getJointByName(std::string(TCHAR_TO_UTF8(*boneName.ToString())));
 
-		//Build a transform from the SMR bone data
-		FTransform newTransform;
-		newTransform.SetTranslation(USmrFunctions::MakeFVector(smrBone->getPosition()));
-		newTransform.SetRotation(USmrFunctions::MakeFQuat(smrBone->getOrientation()));
+		if (smrBone)
+		{
+			//Build a transform from the SMR bone data
+			FTransform newTransform;
+			newTransform.SetTranslation(USmrFunctions::MakeFVector(smrBone->getPosition()));
+			newTransform.SetRotation(USmrFunctions::RightCoordToLeft(USmrFunctions::MakeFQuat(smrBone->getOrientation())));
 
-		//Apply transform to output pose
-		//FCompactPose uses indexing operator to access transforms of bones
-		//Bones are actually stored only as transforms
-		Output.Pose[FCompactPoseBoneIndex(i)] = newTransform;
+
+			//Apply transform to output pose
+			//FCompactPose uses indexing operator to access transforms of bones
+			//Bones are actually stored only as transforms
+			Output.Pose[FCompactPoseBoneIndex(i)] = newTransform;
+		}
 	}
-
 }
 void FAnimNode_Smr::GatherDebugData(FNodeDebugData& DebugData)
 {
