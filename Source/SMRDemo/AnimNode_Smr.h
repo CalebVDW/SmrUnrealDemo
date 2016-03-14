@@ -11,12 +11,9 @@
  *Applies an SMR skeleton to the Unreal representation of it
  */
 USTRUCT()
-struct FAnimNode_Smr : public FAnimNode_Base
+struct FAnimNode_Smr : public FAnimNode_SkeletalControlBase
 {
 	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Links)
-	FPoseLink basePose;
 
 	//SMR skeleton that will be applied to the mesh
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SkeletalControl, meta = (PinShownByDefault))
@@ -26,11 +23,17 @@ struct FAnimNode_Smr : public FAnimNode_Base
 public:
 	FAnimNode_Smr();
 
-	// FAnimNode_Base interface
-	virtual void Initialize(const FAnimationInitializeContext& Context) override;
-	virtual void CacheBones(const FAnimationCacheBonesContext & Context) override;
-	virtual void Update(const FAnimationUpdateContext & Context) override;
-	virtual void Evaluate(FPoseContext& Output) override;
-	virtual void GatherDebugData(FNodeDebugData& DebugData) override;
 
+protected:
+	//SMR logic goes in here
+	virtual void EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases, TArray<FBoneTransform>& OutBoneTransforms) override;
+	
+	//Some sort of skeleton validation would be good here, but return true is fine for now
+	virtual bool IsValidToEvaluate(const USkeleton* Skeleton, const FBoneContainer& RequiredBones) override { return true; }
+
+	//Initialize any bone references??
+	virtual void InitializeBoneReferences(const FBoneContainer& RequiredBones) override;
+
+private:
+	TArray<FBoneReference> bonesToModify;
 };
