@@ -9,7 +9,6 @@
 // FAnimNode_ModifyBone
 
 FAnimNode_Smr::FAnimNode_Smr()
-	:FAnimNode_SkeletalControlBase()
 {
 }
 
@@ -17,22 +16,26 @@ FAnimNode_Smr::FAnimNode_Smr()
 void FAnimNode_Smr::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases, TArray<FBoneTransform>& OutBoneTransforms)
 {
 	check(OutBoneTransforms.Num() == 0);
-	const FBoneContainer BoneContainer = MeshBases.GetPose().GetBoneContainer();
+
+	//Get Unreal data
+	const FBoneContainer boneContainer = MeshBases.GetPose().GetBoneContainer();
+	USkeleton* unrealSkeleton = boneContainer.GetSkeletonAsset();
+	TArray<FBoneNode> unrealBones = unrealSkeleton->GetBoneTree();
+
+	//Retrieve SMR skeleton
+	SMRSkeleton smrSkeleton;
+	if (SmrInput)
+		smrSkeleton = SmrInput->getSkeleton();
+	else
+		return;
+	smrSkeleton.setMode(SMRModeType::RELATIVEMODE);
+	smrSkeleton.setRotationOrder(TRANSLATIONFIRST);
 
 	//Loop through all bones
-	for (int i = 0; i < BoneContainer.GetNumBones(); ++i)
+	for (int i = 0; i < unrealBones.Num(); ++i)
 	{
-		//Retrieve SMR skeleton
-		SMRSkeleton smrSkeleton;
-		if (SmrInput)
-			smrSkeleton = SmrInput->getSkeleton();
-		else
-			break;
-		smrSkeleton.setMode(SMRModeType::RELATIVEMODE);
-		smrSkeleton.setRotationOrder(TRANSLATIONFIRST);
-
-		//Get SMR bone
-		FName boneName = BoneContainer.GetReferenceSkeleton().GetBoneName(i);
+		FName boneName = unrealBones[i].Name_DEPRECATED;
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, boneName.ToString());
 		SMRJoint* smrBone = smrSkeleton.getJointByName(std::string(TCHAR_TO_UTF8(*boneName.ToString())));
 		if (!smrBone)
 			break;
@@ -48,6 +51,12 @@ void FAnimNode_Smr::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp, FCS
 
 		OutBoneTransforms.Add(FBoneTransform(FCompactPoseBoneIndex(i), newBoneTransform));
 	}
+}
+
+void FAnimNode_Smr::GatherDebugData(FNodeDebugData& DebugData)
+{
+	FString DebugLine = DebugData.GetNodeName(this);
+	ComponentPose.GatherDebugData(DebugData);
 }
 
 //Initialize any bone references??

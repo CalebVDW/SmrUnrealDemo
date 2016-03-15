@@ -23,17 +23,17 @@ struct FAnimNode_Smr : public FAnimNode_SkeletalControlBase
 public:
 	FAnimNode_Smr();
 
-
-protected:
 	//SMR logic goes in here
 	virtual void EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases, TArray<FBoneTransform>& OutBoneTransforms) override;
 	
 	//Some sort of skeleton validation would be good here, but return true is fine for now
 	virtual bool IsValidToEvaluate(const USkeleton* Skeleton, const FBoneContainer& RequiredBones) override { return true; }
 
-	//Initialize any bone references??
-	virtual void InitializeBoneReferences(const FBoneContainer& RequiredBones) override;
+	virtual void GatherDebugData(FNodeDebugData& DebugData) override;
 
 private:
 	TArray<FBoneReference> bonesToModify;
+
+	//Initialize any bone references??
+	virtual void InitializeBoneReferences(const FBoneContainer& RequiredBones) override;
 };
