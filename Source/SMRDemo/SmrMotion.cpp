@@ -63,17 +63,19 @@ void ASmrMotion::LoadAnimation(FString path)
 
 void ASmrMotion::PoseCharacterWorldSpace(UPoseableMeshComponent* mesh)
 {
+	//Get skeleton and apply correct settings
 	SMRSkeleton skeleton = m_motion.getSkeleton(m_frameIndex);
 	skeleton.setRotationOrder(TRANSLATIONFIRST);
 	skeleton.setMode(SMRModeType::ABSOLUTEMODE);
 
-	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString(rotator.ToString()));
-
+	//Apply rotation to each bone in the Unreal skeleton
 	for (uint32 i = 0; i < skeleton.getNumJoints(); ++i)
 	{
 		FQuat orientation = USmrFunctions::RightCoordToLeft(USmrFunctions::MakeFQuat(skeleton.getJoint(i)->getOrientation()));
 		FVector euler = orientation.Euler();
 		FRotator rotator = FRotator::MakeFromEuler(euler);
+
+		//Rotations are applied to bones with identical names so the skeletons must match exactly 
 		mesh->SetBoneRotationByName(FName(skeleton.getJoint(i)->getName().c_str()), rotator, EBoneSpaces::WorldSpace);
 	}
 }

@@ -7,6 +7,12 @@
 #include "Classes/Components/PoseableMeshComponent.h"
 #include "SmrMotion.generated.h"
 
+
+/*
+ * Stores a skeleton and motion file loaded with the SMR library
+ * Skeleton is automatically updated every frame 
+ * The getSkeleton() method provides access to the pose for the current frame
+*/
 UCLASS()
 class SMRDEMO_API ASmrMotion : public AActor
 {
