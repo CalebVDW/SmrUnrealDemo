@@ -20,7 +20,7 @@ void FAnimNode_Smr::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp, FCS
 	//Get Unreal data
 	const FBoneContainer boneContainer = MeshBases.GetPose().GetBoneContainer();
 	USkeleton* unrealSkeleton = boneContainer.GetSkeletonAsset();
-	TArray<FBoneNode> unrealBones = unrealSkeleton->GetBoneTree();
+	FReferenceSkeleton refSkeleton = boneContainer.GetReferenceSkeleton();
 
 	//Retrieve SMR skeleton
 	SMRSkeleton smrSkeleton;
@@ -31,13 +31,18 @@ void FAnimNode_Smr::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp, FCS
 	smrSkeleton.setMode(SMRModeType::RELATIVEMODE);
 	smrSkeleton.setRotationOrder(TRANSLATIONFIRST);
 
-	//Loop through all bones
-	for (int i = 0; i < unrealBones.Num(); ++i)
+	//Loop through all bones in the SMRSkeleton
+	for (uint32 i = 0; i < smrSkeleton.getNumJoints(); ++i)
 	{
-		FName boneName = unrealBones[i].Name_DEPRECATED;
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, boneName.ToString());
-		SMRJoint* smrBone = smrSkeleton.getJointByName(std::string(TCHAR_TO_UTF8(*boneName.ToString())));
+		//Get current bone in the SMRSkeleton
+		SMRJoint* smrBone = smrSkeleton.getJoint(i);
 		if (!smrBone)
+			break;
+
+		//Get the index of the bone with the same name in the unreal skeleton
+		FName boneName(smrBone->getName().c_str());
+		uint32 unrealBoneIndex = SkelComp->GetBoneIndex(boneName);
+		if (unrealBoneIndex == INDEX_NONE)
 			break;
 
 		//Set the parent space transformations
@@ -47,9 +52,9 @@ void FAnimNode_Smr::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp, FCS
 
 		//Convert from parent space to component space
 		FAnimationRuntime::ConvertBoneSpaceTransformToCS(SkelComp, MeshBases, newBoneTransform,
-			FCompactPoseBoneIndex(i), EBoneControlSpace::BCS_ParentBoneSpace);
+			FCompactPoseBoneIndex(unrealBoneIndex), EBoneControlSpace::BCS_ParentBoneSpace);
 
-		OutBoneTransforms.Add(FBoneTransform(FCompactPoseBoneIndex(i), newBoneTransform));
+		OutBoneTransforms.Add(FBoneTransform(FCompactPoseBoneIndex(unrealBoneIndex), newBoneTransform));
 	}
 }
 
