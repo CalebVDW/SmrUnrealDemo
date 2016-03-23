@@ -9,16 +9,23 @@
 //Apply SMR animation data to the skeleton
 void FAnimNode_SmrPose::Evaluate(FPoseContext& Output)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Black, FString(TEXT("Evaluating")));
+
 	//Validate input from SMR
 	SMRSkeleton smrSkeleton;
-	if (SmrInput)
-		smrSkeleton = SmrInput->getSkeleton();
-	else
+	if (!SmrInput)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Black, FString(TEXT("Null SMR input")));
 		return;
+	}
+	smrSkeleton = SmrInput->getSkeleton();
+
 	smrSkeleton.setMode(SMRModeType::RELATIVEMODE);
 	smrSkeleton.setRotationOrder(TRANSLATIONFIRST);
 
 	FBoneContainer boneContainer = Output.Pose.GetBoneContainer();
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Black, FString(TEXT("SMR Input is valid")));
+
 
 	//Step through SMR bones
 	for (uint32 i = 0; i < smrSkeleton.getNumJoints(); ++i)
@@ -46,6 +53,19 @@ void FAnimNode_SmrPose::Evaluate(FPoseContext& Output)
 		Bones[BoneIndex.GetInt()] = SkeletonRefPose[SkeletonBoneIndex];
 	}
 	*/
+
+}
+
+void FAnimNode_SmrPose::CacheBones(const FAnimationCacheBonesContext& Context)
+{
+
+}
+void FAnimNode_SmrPose::Update(const FAnimationUpdateContext& Context)
+{
+
+}
+void FAnimNode_SmrPose::Initialize(const FAnimationInitializeContext& Context)
+{
 
 }
 void FAnimNode_SmrPose::GatherDebugData(FNodeDebugData& DebugData)
