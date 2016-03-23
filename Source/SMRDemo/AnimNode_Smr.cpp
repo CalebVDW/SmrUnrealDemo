@@ -16,13 +16,8 @@ FAnimNode_Smr::FAnimNode_Smr()
 void FAnimNode_Smr::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases, TArray<FBoneTransform>& OutBoneTransforms)
 {
 	check(OutBoneTransforms.Num() == 0);
-
-	//Get Unreal data
-	const FBoneContainer boneContainer = MeshBases.GetPose().GetBoneContainer();
-	USkeleton* unrealSkeleton = boneContainer.GetSkeletonAsset();
-	FReferenceSkeleton refSkeleton = boneContainer.GetReferenceSkeleton();
-
-	//Retrieve SMR skeleton
+	Alpha = 1.0f;
+	//Retrieve SMR skeleton and set to correct settings
 	SMRSkeleton smrSkeleton;
 	if (SmrInput)
 		smrSkeleton = SmrInput->getSkeleton();
@@ -31,30 +26,49 @@ void FAnimNode_Smr::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp, FCS
 	smrSkeleton.setMode(SMRModeType::RELATIVEMODE);
 	smrSkeleton.setRotationOrder(TRANSLATIONFIRST);
 
-	//Loop through all bones in the SMRSkeleton
-	for (uint32 i = 0; i < smrSkeleton.getNumJoints(); ++i)
+	//Do root transformations first
+	SMRJoint* joint = smrSkeleton.getRootJoint();
+	if (!joint)
+		return;
+	//Get the index of the bone with the same name in the unreal skeleton
+	FName boneName(joint->getName().c_str());
+	uint32 skelCompBoneIndex = SkelComp->GetBoneIndex(boneName);
+	uint32 boneContainerIndex = MeshBases.GetPose().GetBoneContainer().GetPoseBoneIndexForBoneName(boneName);
+	//Set the parent space transformations
+	FTransform newBoneTransform;
+	newBoneTransform.SetRotation(USmrFunctions::RightCoordToLeft(USmrFunctions::MakeFQuat(joint->getOrientation())));
+
+	//Convert from parent space to component space
+	FAnimationRuntime::ConvertBoneSpaceTransformToCS(SkelComp, MeshBases, newBoneTransform,
+		FCompactPoseBoneIndex(boneContainerIndex), EBoneControlSpace::BCS_ParentBoneSpace);
+	OutBoneTransforms.Add(FBoneTransform(FCompactPoseBoneIndex(boneContainerIndex), newBoneTransform));
+
+	//Evaluate transforms for all child bones
+	EvaluateChildTransforms(SkelComp, MeshBases, OutBoneTransforms, smrSkeleton, joint);
+}
+
+void FAnimNode_Smr::EvaluateChildTransforms(USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases, TArray<FBoneTransform>& OutBoneTransforms, SMRSkeleton smrSkeleton, SMRJoint* parent)
+{
+	//Get a list of all child bones
+	std::vector<unsigned int> childBoneArray = smrSkeleton.getJointChildren(parent->getName());
+	for (uint32 i = 0; i < childBoneArray.size(); ++i)
 	{
-		//Get current bone in the SMRSkeleton
-		SMRJoint* smrBone = smrSkeleton.getJoint(i);
-		if (!smrBone)
-			break;
-
+		SMRJoint* joint = smrSkeleton.getJoint(childBoneArray[i]);
 		//Get the index of the bone with the same name in the unreal skeleton
-		FName boneName(smrBone->getName().c_str());
-		uint32 unrealBoneIndex = SkelComp->GetBoneIndex(boneName);
-		if (unrealBoneIndex == INDEX_NONE)
-			break;
-
+		FName boneName(joint->getName().c_str());
+		uint32 skelCompBoneIndex = SkelComp->GetBoneIndex(boneName);
+		uint32 boneContainerIndex = MeshBases.GetPose().GetBoneContainer().GetPoseBoneIndexForBoneName(boneName);
 		//Set the parent space transformations
 		FTransform newBoneTransform;
-		newBoneTransform.SetTranslation(USmrFunctions::MakeFVector(smrBone->getPosition()));
-		newBoneTransform.SetRotation(USmrFunctions::RightCoordToLeft(USmrFunctions::MakeFQuat(smrBone->getOrientation())));
+		newBoneTransform.SetRotation(USmrFunctions::RightCoordToLeft(USmrFunctions::MakeFQuat(joint->getOrientation())));
 
 		//Convert from parent space to component space
 		FAnimationRuntime::ConvertBoneSpaceTransformToCS(SkelComp, MeshBases, newBoneTransform,
-			FCompactPoseBoneIndex(unrealBoneIndex), EBoneControlSpace::BCS_ParentBoneSpace);
+			FCompactPoseBoneIndex(boneContainerIndex), EBoneControlSpace::BCS_ParentBoneSpace);
+		OutBoneTransforms.Add(FBoneTransform(FCompactPoseBoneIndex(boneContainerIndex), newBoneTransform));
 
-		OutBoneTransforms.Add(FBoneTransform(FCompactPoseBoneIndex(unrealBoneIndex), newBoneTransform));
+		//Evaluate transforms for all child bones
+		EvaluateChildTransforms(SkelComp, MeshBases, OutBoneTransforms, smrSkeleton, joint);
 	}
 }
 

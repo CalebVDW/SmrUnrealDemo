@@ -13,7 +13,6 @@ FQuat USmrFunctions::RightCoordToLeft(FQuat q)
 	return FQuat(-q.X, q.Y, -q.Z, q.W);
 }
 
-
 FVector USmrFunctions::MakeFVector(SMRVector3 v)
 {
 	return FVector{ float(v.m_x), float(v.m_y), float(v.m_z) };

@@ -36,4 +36,8 @@ private:
 
 	//Initialize any bone references??
 	virtual void InitializeBoneReferences(const FBoneContainer& RequiredBones) override;
+
+	//Recursively evalute bone child transforms
+	void EvaluateChildTransforms(USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases, TArray<FBoneTransform>& OutBoneTransforms, SMRSkeleton smrSkeleton, SMRJoint* parent);
+
 };
