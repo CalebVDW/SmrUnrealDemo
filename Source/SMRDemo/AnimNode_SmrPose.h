@@ -15,13 +15,12 @@ struct FAnimNode_SmrPose : public FAnimNode_Base
 	GENERATED_USTRUCT_BODY()
 
 	//SMR skeleton that will be applied to the mesh
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SkeletalControl, meta = (PinShownByDefault))
-	ASmrMotion* SmrInput;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Settings, meta = (PinShownByDefault))
+	mutable ASmrMotion* SmrInput;
 
 
 public:
-	FAnimNode_SmrPose()
-		: FAnimNode_Base() {}
+	FAnimNode_SmrPose();
 
 	virtual void Evaluate(FPoseContext& Output) override;
 	virtual void GatherDebugData(FNodeDebugData& DebugData) override;

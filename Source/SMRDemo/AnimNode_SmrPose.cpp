@@ -6,6 +6,11 @@
 #include "AnimNode_SmrPose.h"
 #include "AnimationRuntime.h"
 
+FAnimNode_SmrPose::FAnimNode_SmrPose()
+{
+
+}
+
 //Apply SMR animation data to the skeleton
 void FAnimNode_SmrPose::Evaluate(FPoseContext& Output)
 {
@@ -62,11 +67,11 @@ void FAnimNode_SmrPose::CacheBones(const FAnimationCacheBonesContext& Context)
 }
 void FAnimNode_SmrPose::Update(const FAnimationUpdateContext& Context)
 {
-
+	EvaluateGraphExposedInputs.Execute(Context);
 }
 void FAnimNode_SmrPose::Initialize(const FAnimationInitializeContext& Context)
 {
-
+	FAnimNode_Base::Initialize(Context);
 }
 void FAnimNode_SmrPose::GatherDebugData(FNodeDebugData& DebugData)
 {
