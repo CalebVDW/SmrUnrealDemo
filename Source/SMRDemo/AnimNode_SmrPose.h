@@ -28,4 +28,8 @@ public:
 	virtual void Initialize(const FAnimationInitializeContext& Context) override;
 	virtual void CacheBones(const FAnimationCacheBonesContext& Context) override;
 
+private:
+	void EvaluateChildren(FPoseContext& Output, SMRJoint* parent);
+	void EvaluateBone(FPoseContext& Output, SMRJoint* joint, SMRJoint* parent);
+	SMRSkeleton smrSkeleton;
 };
