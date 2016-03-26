@@ -106,21 +106,24 @@ void ASmrMotion::TransformChildren(UPoseableMeshComponent* mesh, SMRJoint* bone)
 
 void ASmrMotion::TransformBone(UPoseableMeshComponent* mesh, SMRJoint* bone)
 {
+	//Build the local transform for this bone
 	FTransform finalTransform;
-	FName boneName(bone->getName().c_str());
+	finalTransform.SetLocation(USmrFunctions::RightCoordToLeft(bone->getPosition()));
+	finalTransform.SetRotation(USmrFunctions::RightCoordToLeft(bone->getOrientation()));
+	
 	if (bone->hasParent())
 	{
-		//Build a transform in the parent space of the current bone
+		//Get the component space transform for the parent bone
 		FName parentName(bone->getParentName().c_str());
 		FTransform parentTransform = mesh->GetBoneTransformByName(parentName, EBoneSpaces::ComponentSpace);
-		finalTransform.SetLocation(USmrFunctions::RightCoordToLeft(bone->getPosition()));
-		finalTransform.SetRotation(USmrFunctions::RightCoordToLeft(bone->getOrientation()));
-		//Convert transform to component space
+
+		//Convert local transform to component space
 		finalTransform *= parentTransform;
 	}
 	//Convert quaternion to Euler angles and apply to the mesh
 	FVector euler = finalTransform.GetRotation().Euler();
 	FRotator rotator = FRotator::MakeFromEuler(euler);
+	FName boneName(bone->getName().c_str());
 	mesh->SetBoneRotationByName(boneName, rotator, EBoneSpaces::ComponentSpace);
 }
 
