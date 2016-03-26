@@ -34,6 +34,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = SMR)
 	void PoseCharacterWorldSpace(UPoseableMeshComponent* mesh);
 
+	//Apply local space pose to a poseable mesh
+	UFUNCTION(BlueprintCallable, Category = SMR)
+	void PoseCharacterLocalSpace(UPoseableMeshComponent* mesh);
+
 	const SMRSkeleton& getSkeleton();
 
 private:
@@ -44,4 +48,6 @@ private:
 	SMRMotion m_motion;
 	SMRSkeleton skeleton;
 	
+	void TransformChildren(UPoseableMeshComponent* mesh, SMRJoint* parent);
+	void TransformBone(UPoseableMeshComponent* mesh, SMRJoint* bone);
 };

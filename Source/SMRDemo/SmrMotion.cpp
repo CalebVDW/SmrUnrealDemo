@@ -63,7 +63,7 @@ void ASmrMotion::LoadAnimation(FString path)
 
 void ASmrMotion::PoseCharacterWorldSpace(UPoseableMeshComponent* mesh)
 {
-	SMRSkeleton skeleton = m_motion.getSkeleton(m_frameIndex);
+	skeleton = m_motion.getSkeleton(m_frameIndex);
 	skeleton.setRotationOrder(TRANSLATIONFIRST);
 	skeleton.setMode(SMRModeType::ABSOLUTEMODE);
 
@@ -76,6 +76,52 @@ void ASmrMotion::PoseCharacterWorldSpace(UPoseableMeshComponent* mesh)
 		FRotator rotator = FRotator::MakeFromEuler(euler);
 		mesh->SetBoneRotationByName(FName(skeleton.getJoint(i)->getName().c_str()), rotator, EBoneSpaces::WorldSpace);
 	}
+}
+
+void ASmrMotion::PoseCharacterLocalSpace(UPoseableMeshComponent* mesh)
+{
+	//Initialize skeleton
+	skeleton = m_motion.getSkeleton(m_frameIndex);
+	skeleton.setRotationOrder(TRANSLATIONFIRST);
+	skeleton.setMode(SMRModeType::RELATIVEMODE);
+
+	//Transform root bone
+	SMRJoint* rootJoint = skeleton.getRootJoint();
+	TransformBone(mesh, rootJoint);
+
+	//Recursively transform children
+	TransformChildren(mesh, rootJoint);
+}
+
+void ASmrMotion::TransformChildren(UPoseableMeshComponent* mesh, SMRJoint* bone)
+{
+	//Recursively apply transformations to all children of this bone
+	std::vector<uint32> children = skeleton.getJointChildren(bone->getName());
+	for (int i = 0; i < children.size(); ++i)
+	{
+		TransformBone(mesh, skeleton.getJoint(children[i]));
+		TransformChildren(mesh, skeleton.getJoint(children[i]));
+	}
+}
+
+void ASmrMotion::TransformBone(UPoseableMeshComponent* mesh, SMRJoint* bone)
+{
+	FTransform finalTransform;
+	FName boneName(bone->getName().c_str());
+	if (bone->hasParent())
+	{
+		//Build a transform in the parent space of the current bone
+		FName parentName(bone->getParentName().c_str());
+		FTransform parentTransform = mesh->GetBoneTransformByName(parentName, EBoneSpaces::ComponentSpace);
+		finalTransform.SetLocation(USmrFunctions::RightCoordToLeft(bone->getPosition()));
+		finalTransform.SetRotation(USmrFunctions::RightCoordToLeft(bone->getOrientation()));
+		//Convert transform to component space
+		finalTransform *= parentTransform;
+	}
+	//Convert quaternion to Euler angles and apply to the mesh
+	FVector euler = finalTransform.GetRotation().Euler();
+	FRotator rotator = FRotator::MakeFromEuler(euler);
+	mesh->SetBoneRotationByName(boneName, rotator, EBoneSpaces::ComponentSpace);
 }
 
 const SMRSkeleton& ASmrMotion::getSkeleton() { return skeleton; }

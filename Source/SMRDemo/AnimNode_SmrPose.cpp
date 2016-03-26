@@ -69,11 +69,11 @@ void FAnimNode_SmrPose::EvaluateBone(FPoseContext& Output, SMRJoint* joint, SMRJ
 	{
 		//Convert parent space to component space
 		USkeletalMeshComponent* SkelComp = Output.AnimInstance->GetSkelMeshComponent();
-		FCSPose<FCompactPose> fcs = Output.Pose;
-		FAnimationRuntime::ConvertBoneSpaceTransformToCS(SkelComp, fcs, boneTransform, FCompactPoseBoneIndex(unrealIndex), EBoneControlSpace::BCS_ParentBoneSpace);
+		//FCSPose<FCompactPose> fcs = Output.Pose;
+		//FAnimationRuntime::ConvertBoneSpaceTransformToCS(SkelComp, fcs, boneTransform, FCompactPoseBoneIndex(unrealIndex), EBoneControlSpace::BCS_ParentBoneSpace);
 
 		//Convert component space back to local spae
-		FAnimationRuntime::ConvertCSTransformToBoneSpace(SkelComp, fcs, boneTransform, FCompactPoseBoneIndex(unrealIndex), RotationSpace);
+		//FAnimationRuntime::ConvertCSTransformToBoneSpace(SkelComp, fcs, boneTransform, FCompactPoseBoneIndex(unrealIndex), RotationSpace);
 		
 	}
 
