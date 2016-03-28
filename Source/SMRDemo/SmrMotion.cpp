@@ -63,12 +63,8 @@ void ASmrMotion::LoadAnimation(FString path)
 
 void ASmrMotion::PoseCharacterWorldSpace(UPoseableMeshComponent* mesh)
 {
-<<<<<<< HEAD
 	//Get skeleton and apply correct settings
-	SMRSkeleton skeleton = m_motion.getSkeleton(m_frameIndex);
-=======
 	skeleton = m_motion.getSkeleton(m_frameIndex);
->>>>>>> ComponentSpaceNode
 	skeleton.setRotationOrder(TRANSLATIONFIRST);
 	skeleton.setMode(SMRModeType::ABSOLUTEMODE);
 
