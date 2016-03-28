@@ -91,6 +91,8 @@ void ASmrMotion::PoseCharacterLocalSpace(UPoseableMeshComponent* mesh)
 
 	//Recursively transform children
 	TransformChildren(mesh, rootJoint);
+
+	//TODO//Transform root
 }
 
 void ASmrMotion::TransformChildren(UPoseableMeshComponent* mesh, SMRJoint* bone)
