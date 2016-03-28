@@ -8,18 +8,19 @@ FQuat USmrFunctions::MakeFQuat(SMRQuaternion q)
 	return FQuat(q.m_x, q.m_y, q.m_z, q.m_w);
 }
 
-FQuat USmrFunctions::LeftCoordToRight(FQuat q)
-{
-	//TODO
-	return q;
-}
-
 FQuat USmrFunctions::RightCoordToLeft(FQuat q)
 {
 	return FQuat(-q.X, q.Y, -q.Z, q.W);
 }
+FQuat USmrFunctions::RightCoordToLeft(SMRQuaternion q)
+{
+	return FQuat(-q.m_x, q.m_y, -q.m_z, q.m_w);
+}
 
-
+FVector USmrFunctions::RightCoordToLeft(SMRVector3 v)
+{
+	return FVector{ float(v.m_x), float(-v.m_y), float(v.m_z) };
+}
 FVector USmrFunctions::MakeFVector(SMRVector3 v)
 {
 	return FVector{ float(v.m_x), float(v.m_y), float(v.m_z) };

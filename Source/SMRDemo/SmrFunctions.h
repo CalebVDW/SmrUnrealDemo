@@ -17,8 +17,9 @@ class SMRDEMO_API USmrFunctions : public UBlueprintFunctionLibrary
 public:
 	//Creates a FQuat struct from a SMRQuaternion. Does no conversions between coords. Simply copies x, y, z, w values
 	static FQuat MakeFQuat(SMRQuaternion q);
-	static FQuat LeftCoordToRight(FQuat q);
 	static FQuat RightCoordToLeft(FQuat q);
-	
+	static FQuat RightCoordToLeft(SMRQuaternion q);
+
+	static FVector RightCoordToLeft(SMRVector3);
 	static FVector MakeFVector(SMRVector3);
 };
