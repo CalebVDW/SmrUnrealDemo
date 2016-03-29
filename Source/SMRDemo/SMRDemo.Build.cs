@@ -43,6 +43,8 @@ public class SMRDemo : ModuleRules
         }
         else if(Target.Platform == UnrealTargetPlatform.Mac)
         {
+            isLibrarySupported = true;
+            SmrRootDirectory = "/Users/LATLAB/Documents/Git/SMRFork";
             string LibraryDirectory = Path.Combine(SmrRootDirectory, "win32Build/lib/Release/");
 
             //Link static library
