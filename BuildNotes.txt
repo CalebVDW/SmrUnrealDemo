@@ -1,0 +1,45 @@
+//Tutorials////////////////////////////////////////////////////////////////////////////////////////
+1. Building the project after cloning the repo
+	-Right click on the "NameOfProject.uproject" file and generate the VS/Xcode project files
+	-Open the newly generated project and build it using the IDE
+		-Building the configurations ending with "Editor" will launch the editor with the project open. This is probably what you want
+		-The project can be built for debugging, but this will only work if you opted to download the engine with debugging symbols
+			-This is not a default option so if you don't remember checking it before downloading, you probably can't debug
+			-Building for debugging allows you to step through code (including engine code) line by line with VS so I recommend you download with symbols
+		-The project must be built for release before it can be opened from the engine without building it in the IDE (not 100% on this but it's something to try if you have this problem)
+		
+2. Adding code to the project
+	//The game code is edited with VS or Xcode, but it is build using the Unreal build system
+	//Therefore, files that are added to the project using VS/Xcode will not be recognized by Unreal
+	//Use the following steps to add a new class to the project
+	-Open the project in the editor
+	-File->New C++ Class
+	-Choose a base class for the code
+	//The code that you add is compiled by clicking "Compile" in the Editor
+	//This eliminates the need to rebuild the entire project after adding a new class
+
+3. Removing code from the project
+	//Since the build system is managed by Unreal and not the IDE, simply deleting files in the IDE will ABSOLUTELY NOT WORK
+	-Close the editor and IDE
+	-Delete the source files
+	-Delete everything in the "Binaries" directory (located in the top level Unreal project directory)
+	-Delete everything in the "Intermediate" directory (located next to the Binaries directory)
+	-Go through above steps for building the project after cloning
+	//As you can see deleting code from the project is a huge pain
+	//Furthermore, anyone who pulls your changes will also have to rebuild the project
+		//This is because "Intermediate" and "Binaries" are not part of the remote repo 
+	//The easiest solution is to get it right the first time and eliminate the need for deleting classes
+	
+//Bugs I have encountered//////////////////////////////////////////////////////////////////////////
+1. Building the project from the IDE produces an error window saying something like "unable to start 'path/to/the/engine/installation/unused/UE4.exe'"
+	-This error occassionally occurs after re-generating the project files
+	-The solution is simple: In the solution explorer there are 2 projects, one with the name of the game and the other named "engine"
+	-Set the game as the startup project and it should be fine
+	-That is for VS and I don't know the exact steps for Xcode but it should be similar
+	
+2. After deleting a class you recompile and get a bunch of link errors for stuff that was in the class you deleted
+	-You forgot to delete the contents of "Intermediate"
+	
+	
+	
+	

@@ -2,28 +2,28 @@
 
 #include "SMRDemo.h"
 #include "SmrFunctions.h"
-#include "SmrMotion.h"
+#include "SmrActor.h"
 
 
 // Sets default values
-ASmrMotion::ASmrMotion()
+ASmrActor::ASmrActor()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
 
 // Called when the game starts or when spawned
-void ASmrMotion::BeginPlay()
+void ASmrActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
-void ASmrMotion::Tick( float DeltaTime )
+void ASmrActor::Tick(float DeltaTime)
 {
-	Super::Tick( DeltaTime );
+	Super::Tick(DeltaTime);
 	//Keep SMR animation up to date with Unreal scene
 	m_framePause++;
 	if (m_framePause > m_speed)
@@ -34,7 +34,7 @@ void ASmrMotion::Tick( float DeltaTime )
 	if (uint32(m_frameIndex) >= m_motion.getNumFrames()) m_frameIndex = 0;
 }
 
-void ASmrMotion::LoadSkeleton(FString path)
+void ASmrActor::LoadSkeleton(FString path)
 {
 	std::string skeletonFilePath = "C:/Git/SMRFork/data/bvh/benTest.bvh";
 	skeleton = loadSkeletonFromBVH(getFileName(skeletonFilePath));
@@ -55,13 +55,13 @@ void ASmrMotion::LoadSkeleton(FString path)
 	}
 }
 
-void ASmrMotion::LoadAnimation(FString path)
+void ASmrActor::LoadAnimation(FString path)
 {
 	std::string motionFilePath = "C:/Git/SMRFork/data/bvh/benTest.bvh";
 	m_motion = loadMotionFromBVH(motionFilePath);
 }
 
-void ASmrMotion::PoseCharacterWorldSpace(UPoseableMeshComponent* mesh)
+void ASmrActor::PoseCharacterWorldSpace(UPoseableMeshComponent* mesh)
 {
 	//Get skeleton and apply correct settings
 	skeleton = m_motion.getSkeleton(m_frameIndex);
@@ -80,7 +80,7 @@ void ASmrMotion::PoseCharacterWorldSpace(UPoseableMeshComponent* mesh)
 	}
 }
 
-void ASmrMotion::PoseCharacterLocalSpace(UPoseableMeshComponent* mesh)
+void ASmrActor::PoseCharacterLocalSpace(UPoseableMeshComponent* mesh)
 {
 	//Initialize skeleton
 	skeleton = m_motion.getSkeleton(m_frameIndex);
@@ -97,7 +97,7 @@ void ASmrMotion::PoseCharacterLocalSpace(UPoseableMeshComponent* mesh)
 	//TODO//Transform root
 }
 
-void ASmrMotion::TransformChildren(UPoseableMeshComponent* mesh, SMRJoint* bone)
+void ASmrActor::TransformChildren(UPoseableMeshComponent* mesh, SMRJoint* bone)
 {
 	//Recursively apply transformations to all children of this bone
 	std::vector<uint32> children = skeleton.getJointChildren(bone->getName());
@@ -108,13 +108,13 @@ void ASmrMotion::TransformChildren(UPoseableMeshComponent* mesh, SMRJoint* bone)
 	}
 }
 
-void ASmrMotion::TransformBone(UPoseableMeshComponent* mesh, SMRJoint* bone)
+void ASmrActor::TransformBone(UPoseableMeshComponent* mesh, SMRJoint* bone)
 {
 	//Build the local transform for this bone
 	FTransform finalTransform;
 	finalTransform.SetLocation(USmrFunctions::RightCoordToLeft(bone->getPosition()));
 	finalTransform.SetRotation(USmrFunctions::RightCoordToLeft(bone->getOrientation()));
-	
+
 	if (bone->hasParent())
 	{
 		//Get the component space transform for the parent bone
@@ -131,4 +131,4 @@ void ASmrMotion::TransformBone(UPoseableMeshComponent* mesh, SMRJoint* bone)
 	mesh->SetBoneRotationByName(boneName, rotator, EBoneSpaces::ComponentSpace);
 }
 
-const SMRSkeleton& ASmrMotion::getSkeleton() { return skeleton; }
+const SMRSkeleton& ASmrActor::getSkeleton() { return skeleton; }
