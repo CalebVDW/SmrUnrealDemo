@@ -17,14 +17,13 @@ public class SMRDemo : ModuleRules
     public bool LoadSmr(TargetInfo Target)
     {
         bool isLibrarySupported = false;
-
+        string SmrRootDirectory = Path.GetFullPath(Path.Combine(ModulePath, "../../SMR/"));
         if ((Target.Platform == UnrealTargetPlatform.Win64) || (Target.Platform == UnrealTargetPlatform.Win32))
-        {
+        {            
             isLibrarySupported = true;
             //This hardcoded path obviously needs to be replaced with something that isn't so brittle
             //The likely solution will be to copy the entire SMR directory into the Unreal plugins directory
             //Then use a built in engine function to get the location of that directory
-            string SmrRootDirectory = "C:/Git/SMRFork/";
             string LibraryDirectory = Path.Combine(SmrRootDirectory, "win32Build/lib/Release/");
             Console.WriteLine(LibraryDirectory);
             Console.WriteLine(Path.Combine(LibraryDirectory, "math.lib"));
