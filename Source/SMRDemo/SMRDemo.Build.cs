@@ -17,7 +17,10 @@ public class SMRDemo : ModuleRules
     public bool LoadSmr(TargetInfo Target)
     {
         bool isLibrarySupported = false;
-        string SmrRootDirectory = Path.GetFullPath(Path.Combine(ModulePath, "../../SMR/"));
+        //The directory where the source for this module is located
+        string modulePath = Path.GetDirectoryName(RulesCompiler.GetModuleFilename(this.GetType().Name));
+        //The SMR root directory should be located here
+        string SmrRootDirectory = Path.GetFullPath(Path.Combine(modulePath, "../../SMR/"));
         if ((Target.Platform == UnrealTargetPlatform.Win64) || (Target.Platform == UnrealTargetPlatform.Win32))
         {            
             isLibrarySupported = true;
