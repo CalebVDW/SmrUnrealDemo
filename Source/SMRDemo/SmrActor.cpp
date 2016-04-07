@@ -36,7 +36,9 @@ void ASmrActor::Tick(float DeltaTime)
 
 void ASmrActor::LoadSkeleton(FString path)
 {
-	std::string skeletonFilePath = "C:/Git/SMRFork/data/bvh/benTest.bvh";
+    FString rootDir = FPaths::RootDir();
+    std::string stdRootDir(TCHAR_TO_UTF8(*rootDir));
+	std::string skeletonFilePath = stdRootDir + "SMR/data/bvh/benTest.bvh";
 	skeleton = loadSkeletonFromBVH(getFileName(skeletonFilePath));
 	skeleton.setRotationOrder(TRANSLATIONFIRST);
 
@@ -57,7 +59,9 @@ void ASmrActor::LoadSkeleton(FString path)
 
 void ASmrActor::LoadAnimation(FString path)
 {
-	std::string motionFilePath = "C:/Git/SMRFork/data/bvh/benTest.bvh";
+    FString rootDir = FPaths::RootDir();
+    std::string stdRootDir(TCHAR_TO_UTF8(*rootDir));
+    std::string motionFilePath = stdRootDir + "SMR/data/bvh/benTest.bvh";
 	m_motion = loadMotionFromBVH(motionFilePath);
 }
 
