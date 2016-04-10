@@ -36,10 +36,19 @@ void ASmrActor::Tick(float DeltaTime)
 
 void ASmrActor::LoadSkeleton(FString path)
 {
-    FString rootDir = FPaths::RootDir();
-    std::string stdRootDir(TCHAR_TO_UTF8(*rootDir));
-	std::string skeletonFilePath = stdRootDir + "SMR/data/bvh/benTest.bvh";
-	skeleton = loadSkeletonFromBVH(getFileName(skeletonFilePath));
+	//Use default path to the benTest file if no path is specified
+	if (path == "")
+	{
+		FString sourceDir = FPaths::GameSourceDir();
+		std::string stdSourceDir(TCHAR_TO_UTF8(*sourceDir));
+		std::string skeletonFilePath = stdSourceDir + "../SMR/data/bvh/benTest.bvh";
+		skeleton = loadSkeletonFromBVH(getFileName(skeletonFilePath));
+	}
+	else
+	{
+		skeleton = loadSkeletonFromBVH(getFileName(std::string(TCHAR_TO_UTF8(*path))));
+	}
+	
 	skeleton.setRotationOrder(TRANSLATIONFIRST);
 
 	for (uint32 i = 0; i < skeleton.getNumJoints(); ++i)
@@ -53,16 +62,21 @@ void ASmrActor::LoadSkeleton(FString path)
 			pos = boneName.find('.');
 		}
 		skeleton.getJoint(i)->setName(boneName);
-		UE_LOG(LogTemp, Warning, TEXT("Bone Name: %s"), *FString(skeleton.getJoint(i)->getName().c_str()));
+		//UE_LOG(LogTemp, Warning, TEXT("Bone Name: %s"), *FString(skeleton.getJoint(i)->getName().c_str()));
 	}
 }
 
 void ASmrActor::LoadAnimation(FString path)
 {
-    FString rootDir = FPaths::RootDir();
-    std::string stdRootDir(TCHAR_TO_UTF8(*rootDir));
-    std::string motionFilePath = stdRootDir + "SMR/data/bvh/benTest.bvh";
-	m_motion = loadMotionFromBVH(motionFilePath);
+	if (path == "")
+	{
+		FString sourceDir = FPaths::GameSourceDir();
+		std::string stdSourceDir(TCHAR_TO_UTF8(*sourceDir));
+		std::string motionFilePath = stdSourceDir + "../SMR/data/bvh/benTest.bvh";
+		m_motion = loadMotionFromBVH(motionFilePath);
+		return;
+	}
+	m_motion = loadMotionFromBVH(getFileName(std::string(TCHAR_TO_UTF8(*path))));
 }
 
 void ASmrActor::PoseCharacterWorldSpace(UPoseableMeshComponent* mesh)
