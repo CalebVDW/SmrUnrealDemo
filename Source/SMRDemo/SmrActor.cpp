@@ -16,14 +16,12 @@ ASmrActor::ASmrActor()
 // Called when the game starts or when spawned
 void ASmrActor::BeginPlay()
 {
-	Super::BeginPlay();
 
 }
 
 // Called every frame
 void ASmrActor::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
 	//Keep SMR animation up to date with Unreal scene
 	m_framePause++;
 	if (m_framePause > m_speed)
