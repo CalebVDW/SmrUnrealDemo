@@ -107,10 +107,14 @@ void ASmrActor::PoseCharacterLocalSpace(UPoseableMeshComponent* mesh)
 	SMRJoint* rootJoint = skeleton.getRootJoint();
 	TransformBone(mesh, rootJoint);
 
+    //Apply root transformations to the component instead of the root joint
+    FTransform rootTransform;
+    rootTransform.SetLocation(USmrFunctions::RightCoordToLeft(rootJoint->getPosition()));
+    rootTransform.SetRotation(USmrFunctions::RightCoordToLeft(rootJoint->getOrientation()));
+    mesh->SetRelativeTransform(rootTransform);
+    
 	//Recursively transform children
 	TransformChildren(mesh, rootJoint);
-
-	//TODO//Transform root
 }
 
 void ASmrActor::TransformChildren(UPoseableMeshComponent* mesh, SMRJoint* bone)
