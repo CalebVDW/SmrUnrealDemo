@@ -14,13 +14,19 @@ public class SMRDemo : ModuleRules
 
         LoadSmr(Target);
     }
+    public string ProjectRoot
+    {
+        get
+        {
+            return System.IO.Path.GetFullPath(System.IO.Path.Combine(ModuleDirectory, "../../"));
+        }
+    }
     public bool LoadSmr(TargetInfo Target)
     {
         bool isLibrarySupported = false;
-        //The directory where the source for this module is located
-        string modulePath = Path.GetDirectoryName(RulesCompiler.GetModuleFilename(this.GetType().Name));
-        //The SMR root directory should be located here
-        string SmrRootDirectory = Path.GetFullPath(Path.Combine(modulePath, "../../SMR/"));
+
+        //Path to the SMR root directory
+        string SmrRootDirectory = Path.GetFullPath(Path.Combine(ProjectRoot, "SMR/"));
 		if ((Target.Platform == UnrealTargetPlatform.Win64) || (Target.Platform == UnrealTargetPlatform.Win32)) {            
 			isLibrarySupported = true;
 			//This hardcoded path obviously needs to be replaced with something that isn't so brittle
@@ -35,18 +41,18 @@ public class SMRDemo : ModuleRules
 			PublicAdditionalLibraries.Add (Path.Combine (LibraryDirectory, "newmat.lib"));           
 			PublicAdditionalLibraries.Add (Path.Combine (LibraryDirectory, "common.lib"));           
 			PublicAdditionalLibraries.Add (Path.Combine (LibraryDirectory, "core.lib"));                    
-			PublicAdditionalLibraries.Add (Path.Combine (LibraryDirectory, "log4cplus.lib"));
+			PublicAdditionalLibraries.Add (Path.Combine (LibraryDirectory, "log4cplusSU.lib"));
 			PublicAdditionalLibraries.Add (Path.Combine (LibraryDirectory, "io.lib"));
 
-			//Add any necessary include directories
-			//Using all include directories from the CMake file for the UnrealAPI project
-			//I don't know where the opengl, glfw and horde include directories are but this should be fine
-			PublicIncludePaths.Add (Path.Combine (SmrRootDirectory, "Smr/SRC/common/"));
+            //Add any necessary include directories
+            //Using all include directories from the CMake file for the UnrealAPI project
+            //I don't know where the opengl, glfw and horde include directories are but this should be fine
+            PublicIncludePaths.Add(Path.Combine(SmrRootDirectory, "Smr/thirdParty/Universal/log4cplus-1.2.0/include/"));
+            PublicIncludePaths.Add (Path.Combine (SmrRootDirectory, "Smr/SRC/common/"));
 			PublicIncludePaths.Add (Path.Combine (SmrRootDirectory, "Smr/SRC/SmrMath/"));
 			PublicIncludePaths.Add (Path.Combine (SmrRootDirectory, "Smr/SRC/SmrCore/"));
 			PublicIncludePaths.Add (Path.Combine (SmrRootDirectory, "Smr/SRC/SmrIO/"));
 			PublicIncludePaths.Add (Path.Combine (SmrRootDirectory, "Smr/SRC/SmrUtils/"));
-			PublicIncludePaths.Add (Path.Combine (SmrRootDirectory, "Smr/thirdParty/Universal/log4cplus-1.2.0/include/"));
 			PublicIncludePaths.Add (Path.Combine (SmrRootDirectory, "Smr/thirdParty/Universal/newmat/"));
 
 		} 
