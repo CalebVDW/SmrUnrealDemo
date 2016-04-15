@@ -41,7 +41,7 @@ public class SMRDemo : ModuleRules
 			PublicAdditionalLibraries.Add (Path.Combine (LibraryDirectory, "newmat.lib"));           
 			PublicAdditionalLibraries.Add (Path.Combine (LibraryDirectory, "common.lib"));           
 			PublicAdditionalLibraries.Add (Path.Combine (LibraryDirectory, "core.lib"));                    
-			PublicAdditionalLibraries.Add (Path.Combine (LibraryDirectory, "log4cplusSU.lib"));
+			PublicAdditionalLibraries.Add (Path.Combine (LibraryDirectory, "log4cplusS.lib"));
 			PublicAdditionalLibraries.Add (Path.Combine (LibraryDirectory, "io.lib"));
 
             //Add any necessary include directories
