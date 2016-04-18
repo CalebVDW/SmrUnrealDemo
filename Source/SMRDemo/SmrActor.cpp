@@ -93,6 +93,10 @@ void ASmrActor::PoseCharacterLocalSpace(UPoseableMeshComponent* mesh)
 	SMRJoint* rootJoint = skeleton.getJointByName("root");
 	TransformBone(mesh, rootJoint);
 
+	FVector rootOffset = USmrFunctions::RightCoordToLeft(rootJoint->getPosition());
+	FName rootName(rootJoint->getName().c_str());
+	mesh->SetBoneLocationByName(rootName, rootOffset, EBoneSpaces::ComponentSpace);
+
     //Apply root transformations to the component instead of the root joint
     FTransform rootTransform;
     rootTransform.SetLocation(USmrFunctions::RightCoordToLeft(rootJoint->getPosition()));
