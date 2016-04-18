@@ -39,7 +39,7 @@ void ASmrActor::LoadSkeleton(FString path)
 	{
 		FString sourceDir = FPaths::GameSourceDir();
 		std::string stdSourceDir(TCHAR_TO_UTF8(*sourceDir));
-		std::string skeletonFilePath = stdSourceDir + "../SMR/data/bvh/benTest.bvh";
+		std::string skeletonFilePath = stdSourceDir + "../Content/SMR/data/bvh/benTest.bvh";
 		skeleton = loadSkeletonFromBVH(getFileName(skeletonFilePath));
 	}
 	else
@@ -70,7 +70,7 @@ void ASmrActor::LoadAnimation(FString path)
 	{
 		FString sourceDir = FPaths::GameSourceDir();
 		std::string stdSourceDir(TCHAR_TO_UTF8(*sourceDir));
-		std::string motionFilePath = stdSourceDir + "../SMR/data/bvh/benTest.bvh";
+		std::string motionFilePath = stdSourceDir + "../Content/SMR/data/bvh/benTest.bvh";
 		m_motion = loadMotionFromBVH(motionFilePath);
 		return;
 	}
