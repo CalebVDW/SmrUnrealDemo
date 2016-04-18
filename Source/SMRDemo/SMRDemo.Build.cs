@@ -8,8 +8,11 @@ public class SMRDemo : ModuleRules
 {
 	public SMRDemo(TargetInfo Target)
 	{
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UnrealEd", "AnimGraph", "AnimGraphRuntime", "BlueprintGraph" });
-
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+        if (UEBuildConfiguration.bBuildEditor)
+        {
+            PublicDependencyModuleNames.AddRange(new string[] { "UnrealEd" });
+        }
         PrivateDependencyModuleNames.AddRange(new string[] {  });
 
         LoadSmr(Target);
@@ -26,7 +29,7 @@ public class SMRDemo : ModuleRules
         bool isLibrarySupported = false;
 
         //Path to the SMR root directory
-        string SmrRootDirectory = Path.GetFullPath(Path.Combine(ProjectRoot, "SMR/"));
+        string SmrRootDirectory = Path.GetFullPath(Path.Combine(ProjectRoot, "Content/SMR/"));
 		if ((Target.Platform == UnrealTargetPlatform.Win64) || (Target.Platform == UnrealTargetPlatform.Win32)) {            
 			isLibrarySupported = true;
 			//This hardcoded path obviously needs to be replaced with something that isn't so brittle
