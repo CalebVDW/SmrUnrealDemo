@@ -48,20 +48,6 @@ void ASmrActor::LoadSkeleton(FString path)
 	}
 	
 	skeleton.setRotationOrder(TRANSLATIONFIRST);
-
-	for (uint32 i = 0; i < skeleton.getNumJoints(); ++i)
-	{
-		//Replaces points with underscores because that is what Unreal does when it imports 
-		std::string boneName = skeleton.getJoint(i)->getName();
-		auto pos = boneName.find('.');
-		while (pos != std::string::npos)
-		{
-			boneName.replace(pos, 1, "_");
-			pos = boneName.find('.');
-		}
-		skeleton.getJoint(i)->setName(boneName);
-		//UE_LOG(LogTemp, Warning, TEXT("Bone Name: %s"), *FString(skeleton.getJoint(i)->getName().c_str()));
-	}
 }
 
 void ASmrActor::LoadAnimation(FString path)
@@ -104,13 +90,11 @@ void ASmrActor::PoseCharacterLocalSpace(UPoseableMeshComponent* mesh)
 	skeleton.setMode(SMRModeType::RELATIVEMODE);
 
 	//Transform root bone
-	SMRJoint* rootJoint = skeleton.getRootJoint();
+	SMRJoint* rootJoint = skeleton.getJointByName("root");
 	TransformBone(mesh, rootJoint);
-
+    
 	//Recursively transform children
 	TransformChildren(mesh, rootJoint);
-
-	//TODO//Transform root
 }
 
 void ASmrActor::TransformChildren(UPoseableMeshComponent* mesh, SMRJoint* bone)
